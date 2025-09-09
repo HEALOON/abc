@@ -20,11 +20,17 @@ function draw() {
     rect(0, i * blockH, width, blockH);
   }
 
-  // 根据触摸情况，决定哪个区块显示圆
+  // 根据触摸情况，决定每个区块左/右侧是否画圆
   for (let i = 0; i < 4; i++) {
-    if (isBlockTouched(i, blockH)) {
-      fill(0);
-      circle(width - 50, i * blockH + blockH / 2, 50);
+    let { leftTouched, rightTouched } = getTouchSidesForBlock(i, blockH);
+
+    // 触碰左侧 -> 右侧出现黑圆
+    if (leftTouched) {
+      drawCircleRight(i, blockH);
+    }
+    // 触碰右侧 -> 左侧出现黑圆
+    if (rightTouched) {
+      drawCircleLeft(i, blockH);
     }
   }
 
@@ -33,14 +39,30 @@ function draw() {
   circle(width / 2, height / 2, 100);
 }
 
-// 判断某个区块是否有触摸
-function isBlockTouched(index, blockH) {
+// 统计某个区块内，是否有触点在左/右半区
+function getTouchSidesForBlock(index, blockH) {
+  let top = index * blockH;
+  let bottom = (index + 1) * blockH;
+  let leftTouched = false;
+  let rightTouched = false;
+
   for (let t of touches) {
-    if (t.y > index * blockH && t.y < (index + 1) * blockH) {
-      return true;
+    if (t.y > top && t.y < bottom) {
+      if (t.x < width / 2) leftTouched = true;
+      else rightTouched = true;
     }
   }
-  return false;
+  return { leftTouched, rightTouched };
+}
+
+function drawCircleLeft(index, blockH) {
+  fill(0);
+  circle(50, index * blockH + blockH / 2, 50);
+}
+
+function drawCircleRight(index, blockH) {
+  fill(0);
+  circle(width - 50, index * blockH + blockH / 2, 50);
 }
 
 function windowResized() {
