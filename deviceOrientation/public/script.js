@@ -45,8 +45,8 @@ function tick(){
   const ay = Math.max(-1, Math.min(1, latest.beta  / 45)); // 前后
 
   //速度
-  velX = (velX + ax * GRAVITY) * 1;
-  velY = (velY + ay * GRAVITY) * 1;
+  velX = (velX + ax) ;
+  velY = (velY + ay) ;
 
   posX += velX;
   posY += velY;
@@ -88,6 +88,5 @@ function tick(){
   const b = Math.round(255 * t);
 
   wrapper.style.backgroundColor = `rgb(${r},${g},${b})`;
-
 }
 requestAnimationFrame(tick);
