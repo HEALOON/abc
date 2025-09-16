@@ -1,4 +1,4 @@
-const SQ_SIZE = 100;       
+const sqrL = 100;       
 const GRAVITY = 0.65;         
 
 const wrapper = document.querySelector('#wrapper');
@@ -10,8 +10,8 @@ function getBoxSize(){
 }
 let { w: boxW, h: boxH } = getBoxSize();
 //posision
-let posX = (boxW - SQ_SIZE) / 2;
-let posY = (boxH - SQ_SIZE) / 2;
+let posX = (boxW - sqrL) / 2;
+let posY = (boxH - sqrL) / 2;
 let velX = 0;
 let velY = 0;
 
@@ -20,14 +20,14 @@ let latest = { alpha: 0, beta: 0, gamma: 0 };
 window.addEventListener('resize', () => {
   const size = getBoxSize();
   boxW = size.w; boxH = size.h;
-  posX = Math.max(0, Math.min(posX, boxW - SQ_SIZE));
-  posY = Math.max(0, Math.min(posY, boxH - SQ_SIZE));
+  posX = Math.max(0, Math.min(posX, boxW - sqrL));
+  posY = Math.max(0, Math.min(posY, boxH - sqrL));
 });
 
 function handleOrientation(eventData){
-  latest.alpha = eventData.alpha ?? 0; 
-  latest.beta  = eventData.beta  ?? 0; 
-  latest.gamma = eventData.gamma ?? 0; 
+  latest.alpha = eventData.alpha; 
+  latest.beta  = eventData.beta; 
+  latest.gamma = eventData.gamma; 
 
   document.querySelector('#alpha').innerText = "alpha: " + Math.round(latest.alpha);
   document.querySelector('#beta').innerText  = "beta: "  + Math.round(latest.beta);
@@ -47,13 +47,13 @@ function tick(){
   //速度
   velX = (velX + ax) ;
   velY = (velY + ay) ;
-
+  //位置
   posX += velX;
   posY += velY;
 
   //边界限制
-  const maxX = boxW - SQ_SIZE;
-  const maxY = boxH - SQ_SIZE;
+  const maxX = boxW - sqrL;
+  const maxY = boxH - sqrL;
 
   if (posX < 0){ posX = 0; velX = 0; }
   if (posX > maxX){ posX = maxX; velX = 0; }
@@ -66,7 +66,7 @@ function tick(){
   }
 
   // 方块自身颜色随 Y 位置变化
-  const tY = posY / (boxH - SQ_SIZE);
+  const tY = posY / (boxH - sqrL);
 
   //上绿下黄
   const rBox = Math.round(255 * tY); 
@@ -75,14 +75,14 @@ function tick(){
 
   square.style.backgroundColor = `rgb(${rBox},${gBox},${bBox})`;
 
-  const tx = Math.max(0, Math.min(1, (posX / (boxW - SQ_SIZE))));
+  const tx = Math.max(0, Math.min(1, (posX / (boxW - sqrL))));
   // 左圆右方
   const radiusPct = Math.round(50 * (1 - tx));
   square.style.borderRadius = `${radiusPct}%`;
 
   requestAnimationFrame(tick);
     //背景颜色随Y位置变化
-  const t = posY / (boxH - SQ_SIZE);
+  const t = posY / (boxH - sqrL);
   const r = Math.round(255 * (1 - t));
   const g = 0;
   const b = Math.round(255 * t);
