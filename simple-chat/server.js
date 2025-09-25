@@ -5,8 +5,8 @@ const https = require("https");
 const fs = require("fs");
 
 const app = express(); // the server "app", the server behaviour
-const portHTTP = 4250; // port for http
-const portHTTPS = portHTTP+1; // port for https
+// const portHTTP = 4250; // port for http
+const portHTTPS = 4250; // port for https
 
 
 // returning to the client anything that is
