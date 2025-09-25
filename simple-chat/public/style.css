@@ -47,12 +47,13 @@ body{
     background-color: rgb(155, 197, 252);
     margin-right: 3px;
     font-style: italic;
-  
 }
 .words{
     color: blueviolet;
     /* background-color: blanchedalmond; */
-    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+               "Liberation Mono", "Courier New", monospace;
+    /* font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; */
     font-size: 40px;
 }
 
