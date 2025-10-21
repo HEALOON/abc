@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="zh">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>p5.js Sakura Petals</title>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.9.3/lib/p5.min.js"></script>
+    <style>
+      html, body { margin: 0; padding: 0; height: 100%; }
+      body { background: #dff3ff; }
+    </style>
+  </head>
+  <body>
+    <script>
+      // --- Config ---
+      const PETAL_COUNT = 40;      // 初始花瓣数量
+      const BG = '#dff3ff';        // 浅蓝背景
+      let petals = [];
+      
+      let t = 0;                   // 时间参数用于噪声/风
+
+      function setup() {
+        createCanvas(windowWidth, windowHeight);
+        angleMode(DEGREES);
+        for (let i = 0; i < PETAL_COUNT; i++) {
+          petals.push(new Petal(
+            random(width),
+            random(-height, height),
+            random(14, 28)
+          ));
+        }
+        background(BG);
+      }
+
+      function windowResized() {
+        resizeCanvas(windowWidth, windowHeight);
+        background(BG);
+      }
+
+      function draw() {
+        // 轻微拖尾效果增强“飘落”感觉
+        noStroke();
+        fill(223, 243, 255, 60); // 半透明覆盖营造残影
+        rect(0, 0, width, height);
+
+        t += 0.4; // 时间流逝
+
+        for (const p of petals) {
+          p.update();
+          p.render();
+        }
+      }
+
+
+      class Petal {
+        constructor(x, y, s) {
+          this.x = x;
+          this.y = y;
+          this.size = s;
+          this.baseFall = random(0.6, 1.4); // 基础下落速度
+          this.rot = random(360);
+          this.rotSpeed = random(-1.2, 1.2);
+          this.swaySeed = random(1000);
+          this.tint = color(random(245, 255), random(175, 205), random(190, 220)); // 粉色系
+        }
+
+        update() {
+          // 垂直下落
+          this.y += this.baseFall;
+
+          // 左右轻摆 + 微风
+          const sway = (noise(this.swaySeed + frameCount * 0.01) - 0.5) * 1.6;
+          const wind = sin(t + this.swaySeed * 50) * 0.7; // 常驻微风
+          this.x += sway + wind;
+
+          // 旋转变化（像在空气中翻转）
+          this.rot += this.rotSpeed;
+
+          // 超出边界则从顶部回收
+          if (this.y > height + 40 || this.x < -40 || this.x > width + 40) {
+            this.y = -random(20, 120);
+            this.x = random(-20, width + 20);
+          }
+        }
+
+        render() {
+          push();
+          translate(this.x, this.y);
+          rotate(this.rot);
+          scale(this.size / 24);
+
+          // 花瓣形状（五角梅形的一瓣，简化）
+          noStroke();
+
+          // 底色
+          fill(this.tint);
+          beginShape();
+          // 使用一个略像花瓣的贝塞尔形状
+          vertex(0, 0);
+          bezierVertex(10, -8, 14, -18, 6, -24);
+          bezierVertex(-2, -30, -10, -20, -8, -10);
+          bezierVertex(-6, -2, -2, 2, 0, 0);
+          endShape(CLOSE);
+
+          // 中央高光
+          fill(255, 255, 255, 90);
+          ellipse(-2, -10, 6, 10);
+
+          // 边缘微阴影
+          noFill();
+          stroke(230, 150, 170, 120);
+          strokeWeight(0.8);
+          beginShape();
+          vertex(0, 0);
+          bezierVertex(10, -8, 14, -18, 6, -24);
+          endShape();
+
+          pop();
+        }
+      }
+    </script>
+  </body>
+</html>

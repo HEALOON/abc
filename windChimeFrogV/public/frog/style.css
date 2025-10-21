@@ -1,0 +1,19 @@
+body{
+    margin: 0;
+    overflow: hidden;
+}
+
+.main-wrapper{
+    width:100%;
+    height:100dvh;
+    background-color: #fcdddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+}
+
+#frogImg{
+    transition: width;
+
+}
