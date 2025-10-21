@@ -1,8 +1,8 @@
 const CUT = 1;
 const parts = location.pathname.replace(/\/+$/,'').split('/').filter(Boolean);
-const base  = parts.length ? parts.slice(0, -CUT).join('/') : '';
-console.log("[frog] base:", base);
-
+const base  = parts.length ? '/' + parts.slice(0, -CUT).join('/') : ''; // on SERVER...
+// const base  = parts.length ? parts.slice(0, -CUT).join('/') : ''; // on LOCAL...
+console.log(base);
 let socket;
 
 let readyButton = document.querySelector("#ready");
