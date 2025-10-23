@@ -51,3 +51,24 @@ body{
   opacity: 0;           /* 完全透明 */
   pointer-events: none; /* 不拦截触摸/点击，避免挡住青蛙 */
 }
+/* ===== Center banner (below middle by 40% of viewport height) ===== */
+#stage-banner{
+  position: absolute;
+  left: 50.5%;
+  top: 55%;  /* 使用百分比，垂直正中 */
+  transform: translate(-50%, -50%); /* 以自身中心对齐定位点 */
+  margin: 0;
+  padding: 0;
+
+  font-family: "Comic Sans MS", "Comic Sans", cursive; /* 可换 */
+  font-size: 34em;   /* 字体放大 6 倍 */
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+
+  color: #ffffff;              /* 若背景偏浅可改为 #222 */
+  text-shadow: 0 2px 6px rgba(0,0,0,.45);
+
+  z-index: 5;                  /* 确保在背景上方、在风铃下/上均可见 */
+  pointer-events: none;        /* 不挡青蛙交互 */
+}

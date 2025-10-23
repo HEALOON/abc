@@ -50,3 +50,15 @@ body{
 #ready button, #ready {
   -webkit-tap-highlight-color: transparent;
 }
+
+#portrait-hint{
+  position: fixed; top: 10px; left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  text-align: center;
+  font-family: "Comic Sans MS","Comic Sans",cursive;
+  font-size: 1rem;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,.35);
+  z-index: 10;
+}
