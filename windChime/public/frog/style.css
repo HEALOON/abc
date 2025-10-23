@@ -24,3 +24,29 @@ body{
     transition: width;
 
 }
+
+/* === Text-only ready button === */
+#ready button {
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  box-shadow: none;
+  appearance: none;
+  -webkit-appearance: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  line-height: 1;
+  font-size: 8em; /* enlarge text 5× */
+}
+#ready button:focus,
+#ready button:active {
+  outline: none;
+  box-shadow: none;
+}
+/* Optional: remove tap highlight on mobile */
+#ready button, #ready {
+  -webkit-tap-highlight-color: transparent;
+}
