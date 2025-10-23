@@ -1,0 +1,28 @@
+<!-- One for the -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+  <link rel="manifest" href="../manifest.json" />
+  <title>Conductor — Wind Chime</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <!-- Socket.IO client -->
+  <script src="../socket.io/socket.io.js"></script>
+  <style>
+    /* Ensure the stage fills the viewport */
+    html, body { height: 100%; margin: 0; padding: 0; }
+    .main-wrapper { position: relative; width: 100vw; height: 100vh; overflow: hidden; }
+    #frogs-wrapper { position: relative; width: 100%; height: 100%; overflow: hidden; }
+    /* Optional: make sure images are visible if CSS had conflicts */
+    img.frog { display: block; }
+  </style>
+</head>
+<body>
+  <div class="main-wrapper">
+    <div id="frogs-wrapper"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

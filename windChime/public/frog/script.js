@@ -10,12 +10,11 @@ let mainWrapper = document.querySelector(".main-wrapper");
 
 let audioElm, imgElm;
 let frogIdx;
-let frogSize;
 
 // --- motion tuning (slower movement) ---
 let posX = 0.5, posY = 0.5;       // smoothed position (0..1)
 let targetX = 0.5, targetY = 0.5; // raw target (0..1) from sensors
-const SMOOTH = 0.08;              // smoothing factor (smaller = slower)
+const SMOOTH = 0.17;              // smoothing factor (smaller = slower)
 const SEND_EVERY_MS = 60;         // throttle network updates (ms)
 let _lastSend = 0;                // timestamp for throttling
 // widen the mapping range to reduce sensitivity (tilt more to move same distance)
@@ -29,12 +28,17 @@ function normalize(valDeg, minDeg, maxDeg) {
 }
 function clamp01(v){ return Math.max(0, Math.min(1, v)); }
 
-// 把归一化坐标转为像素（带边界）
+// 把归一化坐标转为像素（带边界）——基于图片当前渲染尺寸
 function applyPosition(nx, ny) {
   const w = window.innerWidth;
   const h = window.innerHeight;
-  const maxX = Math.max(0, w - frogSize);
-  const maxY = Math.max(0, h - frogSize);
+
+  // 用当前元素实际渲染尺寸（未人为设定宽高时即为图片原始显示尺寸）
+  const iw = imgElm ? imgElm.offsetWidth  : 0;
+  const ih = imgElm ? imgElm.offsetHeight : 0;
+
+  const maxX = Math.max(0, w - iw);
+  const maxY = Math.max(0, h - ih);
   const x = Math.round(nx * maxX);
   const y = Math.round(ny * maxY);
 
@@ -56,6 +60,13 @@ function startOrientation() {
 }
 
 readyButton.addEventListener("click", async function(){
+  // 尝试锁定竖屏（失败静默）
+  try {
+    if (screen.orientation && screen.orientation.lock) {
+      await screen.orientation.lock('portrait');
+    }
+  } catch (e) {}
+
   // 舞台容器
   mainWrapper.style.position = "relative";
   mainWrapper.style.width = "100vw";
@@ -112,40 +123,23 @@ window.addEventListener("load", function(){
   imgElm.src = "../imgs/frog"+frogIdx+".png";
   imgElm.id = "frogImg";
 
-  // 尺寸：让青蛙更小（短边的 1/6）
-  frogSize = Math.round(Math.min(window.innerWidth, window.innerHeight) / 6);
-  imgElm.width = frogSize;
-  imgElm.height = frogSize;
-
-  // 绝对定位
+  // 绝对定位（不设置 width/height，使用图片本身大小）
   imgElm.style.position = "absolute";
-  imgElm.style.left = (window.innerWidth - frogSize)/2 + "px";
-  imgElm.style.top  = (window.innerHeight - frogSize)/2 + "px";
 
-  // Set initial smoothed and target positions to center
-  posX = targetX = 0.5;
-  posY = targetY = 0.5;
+  // 图片加载完后才能拿到实际宽高，居中一次并初始化 pos/target
+  imgElm.addEventListener("load", () => {
+    const iw = imgElm.offsetWidth;
+    const ih = imgElm.offsetHeight;
+    imgElm.style.left = (window.innerWidth  - iw) / 2 + "px";
+    imgElm.style.top  = (window.innerHeight - ih) / 2 + "px";
+
+    // 初始位置（归一化）设为居中
+    posX = targetX = 0.5;
+    posY = targetY = 0.5;
+  });
 
   // 点击本地也可播放
   imgElm.addEventListener("click", () => audioElm.play().catch(()=>{}));
-});
-
-// 旋转/改变窗口大小时，自适应尺寸并保持位置
-window.addEventListener("resize", function(){
-  // 以当前像素位置反推归一化坐标
-  const prevLeft = parseInt(imgElm.style.left || "0", 10);
-  const prevTop  = parseInt(imgElm.style.top  || "0", 10);
-  const prevSize = frogSize || 1;
-  const x01 = prevLeft / Math.max(1, window.innerWidth  - prevSize);
-  const y01 = prevTop  / Math.max(1, window.innerHeight - prevSize);
-
-  // 重新计算尺寸（同上规则）
-  frogSize = Math.round(Math.min(window.innerWidth, window.innerHeight) / 6);
-  imgElm.width = frogSize;
-  imgElm.height = frogSize;
-
-  // 在新边界内重新定位
-  applyPosition(x01, y01);
 });
 
 function startTick(){

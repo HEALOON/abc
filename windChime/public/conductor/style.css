@@ -46,3 +46,8 @@ body{
   height: auto; /* maintain aspect ratio */
   width: auto;
 }
+
+#mini0, #mini1 {
+  opacity: 0;           /* 完全透明 */
+  pointer-events: none; /* 不拦截触摸/点击，避免挡住青蛙 */
+}
