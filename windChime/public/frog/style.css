@@ -25,7 +25,7 @@ body{
 
 }
 
-/* === Text-only ready button === */
+
 #ready button {
   background: none;
   border: 0;
@@ -39,26 +39,26 @@ body{
   font: inherit;
   cursor: pointer;
   line-height: 1;
-  font-size: 8em; /* enlarge text 5× */
+  font-size: 8em; 
 }
 #ready button:focus,
 #ready button:active {
   outline: none;
   box-shadow: none;
 }
-/* Optional: remove tap highlight on mobile */
+
 #ready button, #ready {
   -webkit-tap-highlight-color: transparent;
 }
 
 #portrait-hint{
-  position: fixed; top: 10px; left: 50%;
+  position: fixed; top: 500px; left: 50%;
   transform: translateX(-50%);
   margin: 0;
   text-align: center;
   font-family: "Comic Sans MS","Comic Sans",cursive;
   font-size: 1rem;
-  color: #fff;
+  color: #ff396e;
   text-shadow: 0 1px 2px rgba(0,0,0,.35);
   z-index: 10;
 }

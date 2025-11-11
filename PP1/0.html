@@ -1,0 +1,44 @@
+<!-- index.html：用 p5.js CDN 直接跑 -->
+<!doctype html>
+<html>
+  <head><meta charset="utf-8"><script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script></head>
+  <body>
+    <script>
+      // 在点A与点B之间用 lerp(t) 取中间位置
+      let ax=100, ay=300, bx=500, by=120; 
+      let t=0; // 插值比例 [0,1]
+
+      function setup(){ createCanvas(640, 360); textSize(12); }
+      function draw(){
+        background(245);
+        // 用 lerp 计算当前点
+        const x = lerp(ax, bx, t);
+        const y = lerp(ay, by, t);
+
+        // 画出 A、B 和中间点
+        stroke(200); line(ax, ay, bx, by);
+        noStroke(); fill(0); circle(ax, ay, 10); circle(bx, by, 10);
+        fill(30,150,255); circle(x, y, 18);
+
+        // 显示 t
+        fill(0); noStroke();
+        text(`t = ${t.toFixed(2)}  (0→1 从A走到B)`, 10, 20);
+
+        // 让 t 0→1 循环
+        t += 0.01; if (t > 1) t = 0;
+      }
+    </script>
+  </body>
+</html>
+
+
+Safezone将在这5个点,以每2分钟按顺序换到下一个,然后游戏将在第五个safezone时不再改变(for testing reason,现在给我把time duration设置成8秒而不是两分钟),
+safezone范围从点的20米正方形改成25米,然后从紫色线框正方形改成橘色边框浅绿色填充的方形
+Safezone顺序:
+1:31.151517, 121.480270
+2:31.148650, 121.482401
+3:31.150231, 121.484472
+4:31.149892, 121.481752
+5:31.148546, 121.483528
+
+

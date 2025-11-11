@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+  />
+  <link rel="manifest" href="manifest.json" />
+  <title>Giraffes and Satellites Pin</title>
+
+  <!-- 样式统一写在 style.css，这里不写样式 -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- 必要库 -->
+  <script src="lib/p5.js"></script>
+  <script src="lib/mappa.js"></script>
+  <script src="socket.io/socket.io.js"></script>
+</head>
+
+<body>
+  <!-- ===== 开始界面：名称 + 分组(emoji) + 请求GPS ===== -->
+  <div id="start-screen">
+    <h2>Name:</h2>
+    <input id="player-name" type="text" placeholder="user name" />
+
+    <h2>Group：</h2>
+    <!-- 与 sketch.js 兼容的 id（emoji-chooser） -->
+    <div id="emoji-chooser">
+      <button type="button" data-emoji="🐭">🐭</button>
+      <button type="button" data-emoji="🐱">🐱</button>
+    </div>
+
+    <h2>GPS:</h2>
+    <!-- 与既有脚本兼容的按钮 id -->
+    <button id="requestOrientationButton" type="button">Enter</button>
+  </div>
+
+  <!-- ===== 游戏 HUD（常显容器，样式交给 style.css） ===== -->
+  <!-- 顶部：名字 -->
+  <div id="hud-name"></div>
+  <!-- 左上：自己无敌倒计时（仅在无敌期内显示文本） -->
+  <div id="hud-self-invinc"></div>
+  <!-- 右上：目标无敌倒计时（仅在其无敌期内显示文本） -->
+  <div id="hud-target-invinc"></div>
+  <!-- 居中：胜负结果（🐭Win / 🐱Win） -->
+  <div id="hud-gameover"></div>
+  <!-- 右下：猎物端“我被击杀”按钮 -->
+  <button id="btn-self-killed" type="button">Killed Me</button>
+
+  <!-- ===== 地图画布容器（p5 画布会挂在这里） ===== -->
+  <div class="main-wrapper">
+    <div id="p5-canvas-container"></div>
+  </div>
+
+  <!-- 既有：请求 GPS 的脚本（需提供全局函数 requestGPS()） -->
+  <script src="requestGPS.js"></script>
+
+  <!-- ===== 页面最小交互逻辑（仅 index 侧） ===== -->
+  <script>
+    (function () {
+      const nameInput   = document.getElementById("player-name");
+      const chooser     = document.getElementById("emoji-chooser");
+      const gpsBtn      = document.getElementById("requestOrientationButton");
+      const startScreen = document.getElementById("start-screen");
+
+      const hudName     = document.getElementById("hud-name");
+      const btnKilled   = document.getElementById("btn-self-killed");
+
+      // 不做“恢复上次输入”，仅记录当前输入到内存变量，供 sketch.js 读取/上报
+      window.__PLAYER_NAME  = "";
+      window.__PLAYER_EMOJI = "";
+
+      // 选择分组（仅记录；真正发给服务器由 sketch.js 绑定 emoji-chooser 后完成）
+      chooser.addEventListener("click", (e) => {
+        const btn = e.target.closest("button[data-emoji]");
+        if (!btn) return;
+        const emoji = btn.dataset.emoji;
+        window.__PLAYER_EMOJI = emoji;
+      });
+
+      // 点击“request GPS”：记录名字 -> 调用 requestGPS() -> 进入地图（移除开始界面）
+      gpsBtn.addEventListener("click", () => {
+        const name = (nameInput.value || "").trim();
+        window.__PLAYER_NAME = name;
+
+        // HUD 顶部常显自己的名字
+        if (hudName) hudName.textContent = name || "ME";
+
+        if (typeof requestGPS === "function") {
+          requestGPS();
+        }
+
+        if (startScreen && startScreen.parentNode) {
+          startScreen.parentNode.removeChild(startScreen);
+        }
+      });
+
+      // “我被击杀”按钮：由猎物端点击后上报到服务器
+      btnKilled.addEventListener("click", () => {
+        // socket 由 sketch.js 创建；此处在点击时再读取，避免加载时机问题
+        try {
+          if (typeof socket !== "undefined" && socket && typeof socket.emit === "function") {
+            btnKilled.disabled = true;                 // 简单防抖
+            socket.emit('selfKilled');
+            // 允许服务器返回拒绝（例如目标无敌时）；这里做一个简易的回退
+            const reenable = () => { btnKilled.disabled = false; };
+            socket.once && socket.once('killDenied', reenable);
+            // 也可在确认死亡广播后再禁用更久，这里保持最小逻辑
+            setTimeout(reenable, 2000);
+          } else {
+            console.warn('socket 未就绪，无法上报 selfKilled');
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      });
+
+      // 可选：在 index 侧监听 gameOver 并展示（sketch 也可负责）
+      // 这里用轮询等 socket 准备好后再绑定，避免加载先后顺序问题
+      (function waitAndBindSocketHandlers(){
+        if (typeof socket !== "undefined" && socket && typeof socket.on === "function") {
+          const hudGameover = document.getElementById("hud-gameover");
+          socket.on('gameOver', (data) => {
+            if (!hudGameover) return;
+            if (data && data.winner === 'Rat') {
+              hudGameover.textContent = '🐭 Win';
+            } else if (data && data.winner === 'Cat') {
+              hudGameover.textContent = '🐱 Win';
+            } else {
+              hudGameover.textContent = 'Game Over';
+            }
+          });
+        } else {
+          // 等待下一帧再次尝试
+          requestAnimationFrame(waitAndBindSocketHandlers);
+        }
+      })();
+    })();
+  </script>
+
+  <!-- p5 + 地图 + 实时通信与绘制逻辑（最后加载） -->
+  <script src="sketch.js"></script>
+</body>
+</html>
