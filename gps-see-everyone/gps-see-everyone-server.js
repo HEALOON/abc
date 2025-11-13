@@ -29,22 +29,25 @@ let currentlyConntected = []; //list of socket IDs of copnnected clients
 io.on('connection', (socket) => {
 
     // we manage the connection inside here
-    console.log('a user connected', socket.id);
+    // console.log('a user connected', socket.id);
     // keep track of all clients connected
     currentlyConntected.push(socket.id);
+    console.log(currentlyConntected);
     
-    //114
+
     socket.on("locationFromClient", function(data){
-        console.log("got new locatoin", data);
-        //share the location with everybody except
-        //the sender
+        // console.log("got new location", data);
+        // share the location with everybody except
+        // the sender
         let locationInfo = {
             lon: data.lon,
             lat: data.lat,
-            socketID: socket.ID
+            socketID: socket.id
         }
-        socket.boradcast.emit("lacationFromServer", location);
+        socket.broadcast.emit("locationFromServer", locationInfo);
+
     })
+
 
     // DISCONNECT
     socket.on("disconnect", function(){
@@ -52,11 +55,14 @@ io.on('connection', (socket) => {
 
         // delete socket ID from the global array
         // that keeps track of all connected clients 
-        // let idx = currentlyConntected.findIndex(socket.id);
-        // if(idx > -1){
-        //     currentlyConntected.splice(idx, 1);
-        //     console.log(currentlyConntected);
-        // }
+
+        let idx = currentlyConntected.indexOf(socket.id);
+        if(idx > -1){
+            socket.broadcast.emit("deletePerson", {socketID: socket.id});
+
+            currentlyConntected.splice(idx, 1);
+            console.log(currentlyConntected);
+        }
     })
 
 })
